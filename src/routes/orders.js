@@ -1,0 +1,26 @@
+// orders.js
+
+const express = require("express");
+const router = express.Router();
+
+router.get("/", (req, res) => {
+  res.status(200).json({ message: "List all orders" });
+});
+
+router.get("/:id", (req, res) => {
+  res.status(200).json({ message: "Get order by ID", id: req.params.id });
+});
+
+router.post("/", (req, res) => {
+  res.status(200).json({ message: "Create a order" });
+});
+
+router.patch("/:id", (req, res) => {
+  res.status(200).json({ message: "Update a order", id: req.params.id });
+});
+
+router.delete("/:id", (req, res) => {
+  res.status(200).json({ message: "Delete a order", id: req.params.id });
+});
+
+module.exports = router;
