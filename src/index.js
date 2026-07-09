@@ -9,6 +9,8 @@ const vendorRoutes = require("./routes/vendors");
 const productRoutes = require("./routes/products");
 const orderRoutes = require("./routes/orders");
 
+app.use(express.json());
+
 app.get("/api/health", function (req, res) {
   res.status(200).send({
     status: "ok",

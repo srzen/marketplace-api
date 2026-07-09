@@ -8,11 +8,21 @@ router.get("/", (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
+  if (req.params.id === "999") {
+    return res
+      .status(404)
+      .json({ error: "Product not found", id: req.params.id });
+  }
   res.status(200).json({ message: "Get product by ID", id: req.params.id });
 });
 
 router.post("/", (req, res) => {
-  res.status(200).json({ message: "Create a product" });
+  if (!req.body || !req.body.name) {
+    return res
+      .status(400)
+      .json({ error: 'Body missing required "name" field' });
+  }
+  res.status(201).json({ message: "Create a product" });
 });
 
 router.patch("/:id", (req, res) => {
