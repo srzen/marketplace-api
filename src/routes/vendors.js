@@ -17,7 +17,12 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-  res.status(200).json({ message: "Create a vendor" });
+  if (!req.body || !req.body.name) {
+    return res
+      .status(400)
+      .json({ error: 'Body missing required "name" field' });
+  }
+  res.status(201).json({ message: "Create a vendor" });
 });
 
 router.patch("/:id", (req, res) => {
