@@ -8,6 +8,11 @@ router.get("/", (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
+  if (req.params.id === "999") {
+    return res
+      .status(404)
+      .json({ error: "Product not found", id: req.params.id });
+  }
   res.status(200).json({ message: "Get product by ID", id: req.params.id });
 });
 
