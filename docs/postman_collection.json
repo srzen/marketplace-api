@@ -51,6 +51,27 @@
           "response": []
         },
         {
+          "name": "/api/vendors/999 - Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/vendors/999",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "vendors",
+                "999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "/api/vendors",
           "request": {
             "auth": {
@@ -60,7 +81,39 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "",
+              "raw": "{\r\n    \"name\":\"John Doe\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/vendors",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "vendors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/api/vendors - Invalid",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -195,7 +248,60 @@
           "response": []
         },
         {
+          "name": "/api/products/1 - Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/products/999",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "products",
+                "999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "/api/products",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Example Product\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/products",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/api/products - Invalid",
           "request": {
             "auth": {
               "type": "noauth"
@@ -330,6 +436,30 @@
           "response": []
         },
         {
+          "name": "/api/orders/1 - Not Found",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/orders/999",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "orders",
+                "999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "/api/orders",
           "request": {
             "auth": {
@@ -339,7 +469,44 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{\r\n    \"vendorId\": \"10\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/orders",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/api/orders - Invalid",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "http://localhost:3000/api/orders",
