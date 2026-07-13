@@ -112,4 +112,47 @@ Similarly, products that have already been purchased should generally be archive
 - The `order_items` table acts as a join table that resolves the many-to-many relationship between orders and products.
 - Foreign keys enforce valid relationships and help maintain a consistent, normalized database structure.
 
+## Sample DBML
+
+```
+Table vendors  {
+  id integer [primary key]
+  name VARCHAR(100)
+  email VARCHAR(100)
+  phone VARCHAR(15)
+  created_at timestamp
+}
+
+Table products {
+  id integer [primary key]
+  name VARCHAR(100)
+  description varchar(1000)
+  price decimal
+  stock integer
+  vendor_id integer
+  is_active bool
+  created_at timestamp
+}
+
+Table orders {
+  id integer [primary key]
+  customer_email VARCHAR(100)
+  shipping_address varchar(1000)
+  status varchar(20)
+  created_at timestamp
+}
+
+Table order_items {
+  id integer [primary key]
+  order_id integer
+  product_id integer
+  quantity integer
+  unit_price decimal
+}
+
+Ref: vendors.id > products.vendor_id
+Ref: order_items.order_id > orders.id
+Ref: order_items.product_id > products.id
+```
+
 ![](schema_design.png)
