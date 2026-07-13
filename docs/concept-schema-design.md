@@ -115,44 +115,45 @@ Similarly, products that have already been purchased should generally be archive
 ## Sample DBML
 
 ```
-Table vendors  {
-  id integer [primary key]
-  name VARCHAR(100)
-  email VARCHAR(100)
-  phone VARCHAR(15)
-  created_at timestamp
+Table vendors {
+  id integer [pk, increment]
+  name varchar(100) [not null]
+  email varchar(100) [not null, unique]
+  phone varchar(15) [not null]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
 }
 
 Table products {
-  id integer [primary key]
-  name VARCHAR(100)
-  description varchar(1000)
-  price decimal
-  stock integer
-  vendor_id integer
-  is_active bool
-  created_at timestamp
+  id integer [pk, increment]
+  name varchar(100) [not null]
+  description varchar(1000) [not null]
+  price decimal(7,2) [not null]
+  stock integer [not null]
+  vendor_id integer [not null]
+  is_active boolean [not null, default: true]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
 }
 
 Table orders {
-  id integer [primary key]
-  customer_email VARCHAR(100)
-  shipping_address varchar(1000)
-  status varchar(20)
-  created_at timestamp
+  id integer [pk, increment]
+  customer_email varchar(100) [not null]
+  shipping_address varchar(1000) [not null]
+  status varchar(20) [not null]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
 }
 
 Table order_items {
-  id integer [primary key]
-  order_id integer
-  product_id integer
-  quantity integer
-  unit_price decimal
+  id integer [pk, increment]
+  order_id integer [not null]
+  product_id integer [not null]
+  quantity integer [not null]
+  unit_price decimal(7,2) [not null]
 }
 
-Ref: vendors.id > products.vendor_id
-Ref: order_items.order_id > orders.id
-Ref: order_items.product_id > products.id
+Ref: products.vendor_id > vendors.id [delete: restrict]
+Ref: order_items.order_id > orders.id [delete: cascade]
+Ref: order_items.product_id > products.id [delete: restrict]
+
 ```
 
 ![](schema_design.png)
