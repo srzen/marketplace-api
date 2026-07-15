@@ -19,13 +19,15 @@ async function startSeeding() {
   // Ask user before deleting existing database records.
   const rl = readline.createInterface({ input, output });
 
-  const confirmation = await rl.question(
-    "This action will erase all existing database data and replace it with sample data. Do you want to continue seeding? y or n ",
+  const userInput = await rl.question(
+    "This script is destructive. Existing marketplace data will be deleted before seeding. Continue? (y/N) ",
   );
   rl.close();
 
+  const confirmation = userInput.trim().toLowerCase();
+
   try {
-    if (confirmation === "y") {
+    if (confirmation === "y" || confirmation === "yes") {
       // Get a connection to database transaction.
       const connection = await pool.getConnection();
 
@@ -226,7 +228,7 @@ async function startSeeding() {
         // These IDs are later used as foreign keys for order_items.
         const orderIds = {};
 
-        // Insert vendors and map their generated IDs.
+        // Insert orders and map their generated IDs.
         for (const order of orders) {
           const [result] = await connection.query(
             "INSERT INTO orders (customer_email, shipping_address, status) VALUES (?, ?, ?)",
@@ -297,7 +299,15 @@ async function startSeeding() {
 
         // Save all changes permanently.
         await connection.commit();
-        console.log("Transaction completed successfully.");
+        console.log(
+          `Database seeded successfully.
+
+        Inserted:
+        - 3 vendors
+        - 12 products
+        - 3 orders
+        - 7 order items`,
+        );
       } catch (error) {
         // Revert all database changes if any step fails.
         await connection.rollback();
@@ -307,6 +317,8 @@ async function startSeeding() {
         // Return the connection to the pool.
         connection.release();
       }
+    } else {
+      console.log("Seeding cancelled.");
     }
   } finally {
     // Close the connection pool before exiting.
