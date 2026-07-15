@@ -75,7 +75,113 @@ async function startSeeding() {
           vendorIds[vendor.key] = result.insertId;
         }
 
-        console.log(vendorIds);
+        // Sample product data associated with the seeded vendors.
+        const products = [
+          {
+            name: "Mechanical Keyboard",
+            description: "RGB backlit mechanical keyboard with Blue switches.",
+            price: 89.99,
+            stock: 45,
+            vendor_id: vendorIds.v1,
+          },
+          {
+            name: "Wireless Mouse",
+            description: "Ergonomic wireless mouse with adjustable DPI.",
+            price: 29.99,
+            stock: 120,
+            vendor_id: vendorIds.v1,
+          },
+          {
+            name: '27" Monitor',
+            description: "27-inch QHD IPS monitor with 75Hz refresh rate.",
+            price: 249.99,
+            stock: 30,
+            vendor_id: vendorIds.v1,
+          },
+          {
+            name: "USB-C Hub",
+            description:
+              "7-in-1 USB-C hub with HDMI, USB 3.0, and SD card reader.",
+            price: 49.99,
+            stock: 75,
+            vendor_id: vendorIds.v1,
+          },
+          {
+            name: "Bluetooth Speaker",
+            description:
+              "Portable Bluetooth speaker with 12-hour battery life.",
+            price: 59.99,
+            stock: 60,
+            vendor_id: vendorIds.v2,
+          },
+          {
+            name: "Smart Watch",
+            description:
+              "Fitness smartwatch with heart rate and sleep tracking.",
+            price: 179.99,
+            stock: 40,
+            vendor_id: vendorIds.v2,
+          },
+          {
+            name: "Noise Cancelling Headphones",
+            description:
+              "Over-ear wireless headphones with active noise cancellation.",
+            price: 199.99,
+            stock: 25,
+            vendor_id: vendorIds.v2,
+          },
+          {
+            name: "Portable SSD",
+            description: "1TB USB-C portable solid-state drive.",
+            price: 129.99,
+            stock: 50,
+            vendor_id: vendorIds.v2,
+          },
+          {
+            name: "Coffee Maker",
+            description: "12-cup programmable drip coffee maker.",
+            price: 79.99,
+            stock: 35,
+            vendor_id: vendorIds.v3,
+          },
+          {
+            name: "Air Fryer",
+            description: "5.5L digital air fryer with 8 cooking presets.",
+            price: 119.99,
+            stock: 28,
+            vendor_id: vendorIds.v3,
+          },
+          {
+            name: "Desk Lamp",
+            description:
+              "LED desk lamp with adjustable brightness and USB charging port.",
+            price: 34.99,
+            stock: 90,
+            vendor_id: vendorIds.v3,
+          },
+          {
+            name: "Electric Kettle",
+            description:
+              "1.7L stainless steel electric kettle with auto shut-off.",
+            price: 44.99,
+            stock: 55,
+            vendor_id: vendorIds.v3,
+          },
+        ];
+
+        // Insert all products into the database.
+        for (const product of products) {
+          await connection.query(
+            "INSERT INTO products (name, description, price, stock, vendor_id) VALUES (?, ?, ?, ?, ?)",
+            [
+              product.name,
+              product.description,
+              product.price,
+              product.stock,
+              product.vendor_id,
+            ],
+          );
+        }
 
         // Save all changes permanently.
         await connection.commit();
