@@ -39,6 +39,44 @@ async function startSeeding() {
         await connection.query("DELETE FROM products");
         await connection.query("DELETE FROM vendors");
 
+        // Sample vendor data to seed the database.
+        const vendors = [
+          {
+            key: "v1",
+            name: "Tech Haven",
+            email: "tech@haven.com",
+            phone: "+1 704 902 7418",
+          },
+          {
+            key: "v2",
+            name: "Gadget World",
+            email: "sales@gadgetworld.com",
+            phone: "+1 713 515 3068",
+          },
+          {
+            key: "v3",
+            name: "Home Essentials",
+            email: "hello@homeessentials.com",
+            phone: "+1 323 317 1094",
+          },
+        ];
+
+        // Stores the generated database IDs for each vendor.
+        // These IDs are later used as foreign keys for products.
+        const vendorIds = {};
+
+        // Insert vendors and map their generated IDs.
+        for (const vendor of vendors) {
+          const [result] = await connection.query(
+            "INSERT INTO vendors (name, email, phone) VALUES (?, ?, ?)",
+            [vendor.name, vendor.email, vendor.phone],
+          );
+
+          vendorIds[vendor.key] = result.insertId;
+        }
+
+        console.log(vendorIds);
+
         // Save all changes permanently.
         await connection.commit();
         console.log("Transaction completed successfully.");
