@@ -236,6 +236,65 @@ async function startSeeding() {
           orderIds[order.key] = result.insertId;
         }
 
+        // Sample order_items data associated with the seeded products and orders.
+        const orderItems = [
+          {
+            order_id: orderIds.o1,
+            product_id: productIds.p1,
+            quantity: 2,
+            unit_price: products.find((product) => product.key === "p1").price,
+          },
+          {
+            order_id: orderIds.o1,
+            product_id: productIds.p2,
+            quantity: 1,
+            unit_price: products.find((product) => product.key === "p2").price,
+          },
+          {
+            order_id: orderIds.o2,
+            product_id: productIds.p10,
+            quantity: 2,
+            unit_price: products.find((product) => product.key === "p10").price,
+          },
+          {
+            order_id: orderIds.o2,
+            product_id: productIds.p9,
+            quantity: 1,
+            unit_price: products.find((product) => product.key === "p9").price,
+          },
+          {
+            order_id: orderIds.o3,
+            product_id: productIds.p5,
+            quantity: 1,
+            unit_price: products.find((product) => product.key === "p5").price,
+          },
+          {
+            order_id: orderIds.o3,
+            product_id: productIds.p8,
+            quantity: 3,
+            unit_price: products.find((product) => product.key === "p8").price,
+          },
+          {
+            order_id: orderIds.o3,
+            product_id: productIds.p3,
+            quantity: 2,
+            unit_price: products.find((product) => product.key === "p3").price,
+          },
+        ];
+
+        // Insert all order_items into the database.
+        for (const orderItem of orderItems) {
+          await connection.query(
+            "INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)",
+            [
+              orderItem.order_id,
+              orderItem.product_id,
+              orderItem.quantity,
+              orderItem.unit_price,
+            ],
+          );
+        }
+
         // Save all changes permanently.
         await connection.commit();
         console.log("Transaction completed successfully.");
