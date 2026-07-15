@@ -183,6 +183,45 @@ async function startSeeding() {
           );
         }
 
+        // Sample order data to seed the database.
+
+        const orders = [
+          {
+            key: "o1",
+            customerEmail: "john@example.com",
+            shippingAddress: "4539 Clearview Drive, Crescent City, California",
+            status: "Pending",
+          },
+          {
+            key: "o2",
+            customerEmail: "emma@example.com",
+            shippingAddress: "2386 Carolina Avenue, Weslaco, Texas",
+            status: "Processing",
+          },
+          {
+            key: "o3",
+            customerEmail: "alex@example.com",
+            shippingAddress: "3709 Flinderation Road, Homewood, Illinois",
+            status: "Delivered",
+          },
+        ];
+
+        // Stores the generated database IDs for each order.
+        // These IDs are later used as foreign keys for order_items.
+        const orderIds = {};
+
+        // Insert vendors and map their generated IDs.
+        for (const order of orders) {
+          const [result] = await connection.query(
+            "INSERT INTO orders (customer_email, shipping_address, status) VALUES (?, ?, ?)",
+            [order.customerEmail, order.shippingAddress, order.status],
+          );
+
+          orderIds[order.key] = result.insertId;
+        }
+
+        console.log(orderIds);
+
         // Save all changes permanently.
         await connection.commit();
         console.log("Transaction completed successfully.");
