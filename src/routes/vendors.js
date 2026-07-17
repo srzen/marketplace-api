@@ -40,13 +40,40 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", (req, res) => {
-  if (!req.body || !req.body.name) {
-    return res
-      .status(400)
-      .json({ error: 'Body missing required "name" field' });
+// POST /vendors
+// Create a new vendor after validating the request body.
+router.post("/", async (req, res) => {
+  // Ensure all required fields are provided.
+  if (!req.body || !req.body.name || !req.body.email || !req.body.phone) {
+    return res.status(400).json({ error: "Body missing a required field" });
   }
-  res.status(201).json({ message: "Create a vendor" });
+
+  // Only allow the expected vendor properties.
+  const allowedKeys = ["name", "email", "phone"];
+
+  // Use an empty object if req.body is null or undefined.
+  const body = req.body ?? {};
+
+  // Validate every submitted field.
+  for (const [key, value] of Object.entries(body)) {
+    if (!validateInput(value) || !allowedKeys.includes(key)) {
+      return res.status(400).json({ error: "Invalid request body" });
+    }
+  }
+
+  try {
+    const [result] = await pool.query(
+      "INSERT INTO vendors (name, email, phone) VALUES (?, ?, ?)",
+      [req.body.name, req.body.email, req.body.phone],
+    );
+
+    res
+      .status(201)
+      .json({ message: "Vendor created successfully", id: result.insertId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 router.patch("/:id", (req, res) => {
@@ -56,5 +83,16 @@ router.patch("/:id", (req, res) => {
 router.delete("/:id", (req, res) => {
   res.status(200).json({ message: "Delete a vendor", id: req.params.id });
 });
+
+// Returns true if the input is a non-empty string after trimming whitespace.
+function validateInput(input) {
+  let inputIsValid = true;
+
+  if (!input?.trim()) {
+    inputIsValid = false;
+  }
+
+  return inputIsValid;
+}
 
 module.exports = router;
