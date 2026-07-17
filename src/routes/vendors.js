@@ -18,13 +18,26 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", (req, res) => {
-  if (req.params.id === "999") {
-    return res
-      .status(404)
-      .json({ error: "Vendor not found", id: req.params.id });
+// GET /vendors/:id
+// Retrieve a single vendor by its ID.
+router.get("/:id", async (req, res) => {
+  try {
+    const [vendor] = await pool.query("SELECT * FROM vendors WHERE id = ?", [
+      req.params.id,
+    ]);
+
+    // Return 404 if no vendor exists with the provided ID.
+    if (!vendor.length) {
+      return res
+        .status(404)
+        .json({ error: "Vendor not found", id: req.params.id });
+    }
+
+    res.status(200).json(vendor[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
-  res.status(200).json({ message: "Get vendor by ID", id: req.params.id });
 });
 
 router.post("/", (req, res) => {
