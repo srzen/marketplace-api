@@ -2,9 +2,20 @@
 
 const express = require("express");
 const router = express.Router();
+const pool = require("../db/pool");
 
-router.get("/", (req, res) => {
-  res.status(200).json({ message: "List all vendors" });
+// GET /vendors
+// Retrieve and return all vendors from the database.
+router.get("/", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM vendors");
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
 });
 
 router.get("/:id", (req, res) => {
