@@ -76,8 +76,52 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.patch("/:id", (req, res) => {
-  res.status(200).json({ message: "Update a vendor", id: req.params.id });
+// PATCH /vendors/:id
+// Update one or more vendor fields without replacing the entire record.
+router.patch("/:id", async (req, res) => {
+  const cols = [];
+  const values = [];
+
+  // Fields that clients are allowed to update.
+  const allowedKeys = ["name", "email", "phone"];
+
+  const body = req.body ?? {};
+
+  // Validate the request body while building the dynamic UPDATE query.
+  for (const [key, value] of Object.entries(body)) {
+    if (!validateInput(value) || !allowedKeys.includes(key)) {
+      return res.status(400).json({ error: "Invalid request body" });
+    }
+
+    cols.push(`${key} = ?`);
+    values.push(value);
+  }
+
+  // At least one valid field must be supplied for PATCH.
+  if (cols.length && values.length) {
+    try {
+      const [result] = await pool.query(
+        `UPDATE vendors SET ${cols.join(", ")} WHERE id = ?`,
+        [...values, req.params.id],
+      );
+
+      // If no rows were updated, the vendor ID doesn't exist.
+      if (!result.affectedRows) {
+        return res
+          .status(404)
+          .json({ error: "Vendor not found", id: req.params.id });
+      }
+
+      res
+        .status(200)
+        .json({ message: "Vendor updated successfully", id: req.params.id });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  } else {
+    return res.status(400).json({ error: "Body missing a required field" });
+  }
 });
 
 router.delete("/:id", (req, res) => {
