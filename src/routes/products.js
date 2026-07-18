@@ -18,13 +18,26 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", (req, res) => {
-  if (req.params.id === "999") {
-    return res
-      .status(404)
-      .json({ error: "Product not found", id: req.params.id });
+// GET /product/:id
+// Retrieve a single product by its ID.
+router.get("/:id", async (req, res) => {
+  try {
+    const [product] = await pool.query("SELECT * FROM products WHERE id = ?", [
+      req.params.id,
+    ]);
+
+    // Return 404 if no product exists with the provided ID.
+    if (!product.length) {
+      return res
+        .status(404)
+        .json({ error: "Product not found", id: req.params.id });
+    }
+
+    res.status(200).json(product[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
   }
-  res.status(200).json({ message: "Get product by ID", id: req.params.id });
 });
 
 router.post("/", (req, res) => {
