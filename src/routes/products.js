@@ -40,13 +40,50 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", (req, res) => {
-  if (!req.body || !req.body.name) {
-    return res
-      .status(400)
-      .json({ error: 'Body missing required "name" field' });
+// POST /products
+// Create a new product after validating the request body.
+router.post("/", async (req, res) => {
+  // Ensure all required fields are provided.
+  if (
+    !req.body ||
+    !req.body.name ||
+    !req.body.description ||
+    !req.body.price ||
+    !req.body.stock ||
+    !req.body.vendor_id
+  ) {
+    return res.status(400).json({ error: "Body missing a required field" });
   }
-  res.status(201).json({ message: "Create a product" });
+
+  // Only allow expected product properties.
+  const allowedKeys = ["name", "description", "price", "stock", "vendor_id"];
+
+  // Validate every submitted field.
+  for (const [key, value] of Object.entries(req.body)) {
+    if (!validateInput(value) || !allowedKeys.includes(key)) {
+      return res.status(400).json({ error: "Invalid request body" });
+    }
+  }
+
+  try {
+    const [result] = await pool.query(
+      "INSERT INTO products (name, description, price, stock, vendor_id) VALUES (?, ?, ?, ?, ?)",
+      [
+        req.body.name,
+        req.body.description,
+        req.body.price,
+        req.body.stock,
+        req.body.vendor_id,
+      ],
+    );
+
+    res
+      .status(201)
+      .json({ message: "Product created successfully", id: result.insertId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 router.patch("/:id", (req, res) => {
@@ -56,5 +93,18 @@ router.patch("/:id", (req, res) => {
 router.delete("/:id", (req, res) => {
   res.status(200).json({ message: "Delete a product", id: req.params.id });
 });
+
+// Returns true if the input is a valid number or a non-empty string after trimming whitespace.
+function validateInput(input) {
+  if (typeof input === "number") {
+    return input > 0;
+  }
+
+  if (typeof input === "string") {
+    return input.trim().length > 0;
+  }
+
+  return false;
+}
 
 module.exports = router;
