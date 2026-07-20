@@ -134,8 +134,29 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
-  res.status(200).json({ message: "Delete a product", id: req.params.id });
+// DELETE /products/:id
+// Remove a product from the database
+router.delete("/:id", async (req, res) => {
+  try {
+    const [result] = await pool.query("DELETE FROM products WHERE id = ?", [
+      req.params.id,
+    ]);
+
+    // Return 404 if the product does not exist.
+    if (!result.affectedRows) {
+      return res
+        .status(404)
+        .json({ error: "Product not found", id: req.params.id });
+    }
+
+    res.status(200).json({
+      message: "Product deleted succesfully",
+      id: req.params.id,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // Returns true if the input is a valid number or a non-empty string after trimming whitespace.
