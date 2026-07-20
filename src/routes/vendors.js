@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      message: "Internal server error",
+      error: "Internal server error",
     });
   }
 });
@@ -36,7 +36,7 @@ router.get("/:id", async (req, res) => {
     res.status(200).json(vendor[0]);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -51,11 +51,8 @@ router.post("/", async (req, res) => {
   // Only allow the expected vendor properties.
   const allowedKeys = ["name", "email", "phone"];
 
-  // Use an empty object if req.body is null or undefined.
-  const body = req.body ?? {};
-
   // Validate every submitted field.
-  for (const [key, value] of Object.entries(body)) {
+  for (const [key, value] of Object.entries(req.body)) {
     if (!validateInput(value) || !allowedKeys.includes(key)) {
       return res.status(400).json({ error: "Invalid request body" });
     }
@@ -72,7 +69,7 @@ router.post("/", async (req, res) => {
       .json({ message: "Vendor created successfully", id: result.insertId });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -117,7 +114,7 @@ router.patch("/:id", async (req, res) => {
         .json({ message: "Vendor updated successfully", id: req.params.id });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ error: "Internal server error" });
     }
   } else {
     return res.status(400).json({ error: "Body missing a required field" });
@@ -144,7 +141,7 @@ router.delete("/:id", async (req, res) => {
       .json({ message: "Vendor deleted successfully", id: req.params.id });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
