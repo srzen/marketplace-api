@@ -47,6 +47,11 @@ router.post("/", async (req, res) => {
     [productIds],
   );
 
+  // Check for duplicate products before comparing with DB.
+  if (new Set(productIds).size !== productIds.length) {
+    return res.status(400).json({ error: "Items have duplicate products." });
+  }
+
   if (products.length !== productIds.length) {
     return res
       .status(400)
