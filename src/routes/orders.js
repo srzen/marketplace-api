@@ -8,13 +8,59 @@ router.get("/", (req, res) => {
   res.status(200).json({ message: "List all orders" });
 });
 
-router.get("/:id", (req, res) => {
-  if (req.params.id === "999") {
-    return res
-      .status(404)
-      .json({ error: "Order not found", id: req.params.id });
+// GET /orders/:id
+// Retrieve a single order by its ID.
+router.get("/:id", async (req, res) => {
+  try {
+    const [order] = await pool.query(
+      `SELECT 
+      orders.id AS order_id,
+      orders.customer_email,
+      orders.shipping_address,
+      orders.status,
+      orders.created_at,
+      order_items.product_id,
+      products.name AS product_name,
+      order_items.quantity,
+      order_items.unit_price,
+      vendors.id AS vendor_id,
+      vendors.name AS vendor_name
+      FROM orders 
+      JOIN order_items ON orders.id = order_items.order_id 
+      JOIN products ON order_items.product_id = products.id
+      JOIN vendors ON products.vendor_id = vendors.id 
+      WHERE orders.id = ?
+      ORDER BY order_items.id ASC`,
+      [req.params.id],
+    );
+
+    // Return 404 if no order exists with the provided ID.
+    if (!order.length) {
+      return res
+        .status(404)
+        .json({ error: "Order not found", id: req.params.id });
+    }
+    const items = order.map((item) => ({
+      product_id: item.product_id,
+      product_name: item.product_name,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      vendor_id: item.vendor_id,
+      vendor_name: item.vendor_name,
+    }));
+
+    res.status(200).json({
+      id: order[0].order_id,
+      customer_email: order[0].customer_email,
+      shipping_address: order[0].shipping_address,
+      status: order[0].status,
+      created_at: order[0].created_at,
+      items: items,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
   }
-  res.status(200).json({ message: "Get order by ID", id: req.params.id });
 });
 
 // POST /orders
