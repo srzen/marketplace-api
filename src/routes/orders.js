@@ -4,8 +4,16 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../db/pool");
 
-router.get("/", (req, res) => {
-  res.status(200).json({ message: "List all orders" });
+// GET /orders
+// Retrieve and return all orders from the database.
+router.get("/", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM orders");
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // GET /orders/:id
