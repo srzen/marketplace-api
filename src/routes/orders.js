@@ -222,8 +222,28 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
-  res.status(200).json({ message: "Delete a order", id: req.params.id });
+// DELETE /orders/:id
+// Remove an order from the databse.
+router.delete("/:id", async (req, res) => {
+  try {
+    const [result] = await pool.query("DELETE FROM orders WHERE id = ?", [
+      req.params.id,
+    ]);
+
+    // Return 404 if the order does not exist.
+    if (!result.affectedRows) {
+      return res
+        .status(404)
+        .json({ error: "Order not found", id: req.params.id });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Order deleted successfully", id: req.params.id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // Returns true if the input is a valid number, a non-empty string
