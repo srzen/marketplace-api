@@ -79,18 +79,31 @@ router.post("/", async (req, res) => {
     !req.body ||
     !req.body.customer_email ||
     !req.body.shipping_address ||
-    !req.body.items.length
+    !Array.isArray(req.body.items) ||
+    !req.body.items.length ||
+    req.body.items.some((item) =>
+      ["product_id", "quantity"].some((field) => !item[field]),
+    )
   ) {
     return res.status(400).json({ error: "Body missing a required field" });
   }
 
   // Only allow expected product properties.
-  const allowedKeys = ["customer_email", "shipping_address", "items"];
+  const allowedBodyKeys = ["customer_email", "shipping_address", "items"];
+  const allowedItemKeys = ["product_id", "quantity"];
 
   // Validate submitted fields.
   for (const [key, value] of Object.entries(req.body)) {
-    if (!validateInput(value) || !allowedKeys.includes(key)) {
+    if (!validateInput(value) || !allowedBodyKeys.includes(key)) {
       return res.status(400).json({ error: "Invalid request body" });
+    }
+  }
+
+  for (const item of req.body.items) {
+    for (const [key, value] of Object.entries(item)) {
+      if (!validateInput(value) || !allowedItemKeys.includes(key)) {
+        return res.status(400).json({ error: "Invalid item" });
+      }
     }
   }
 
@@ -251,14 +264,10 @@ router.delete("/:id", async (req, res) => {
 function validateInput(input) {
   if (typeof input === "number") {
     return input > 0;
-  }
-
-  if (typeof input === "string") {
+  } else if (typeof input === "string") {
     return input.trim().length > 0;
-  }
-
-  if (typeof input === "object") {
-    return input.length > 0;
+  } else if (typeof input === "object") {
+    return Array.isArray(input) && input.length > 0;
   }
 
   return false;
