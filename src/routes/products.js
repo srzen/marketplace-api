@@ -5,10 +5,44 @@ const router = express.Router();
 const pool = require("../db/pool");
 
 // GET /products
-// Retrieve and return all products from the database.
+// Retrieve products, with optional filtering by vendor_id and/or max_price.
 router.get("/", async (req, res) => {
+  const conditions = [];
+  const values = [];
+  let whereClause = "";
+
+  // Validate and apply vendor filter if provided.
+  if (req.query.vendor_id) {
+    const vendorId = Number(req.query.vendor_id);
+    if (!Number.isInteger(vendorId)) {
+      return res.status(400).json({ error: "vendor_id must be an integer" });
+    }
+    conditions.push("vendor_id = ?");
+    values.push(vendorId);
+  }
+
+  // Validate and apply maximum price filter if provided.
+  if (req.query.max_price) {
+    const maxPrice = Number(req.query.max_price);
+    if (Number.isNaN(maxPrice)) {
+      return res.status(400).json({ error: "max_price must be a number" });
+    }
+    conditions.push("price <= ?");
+    values.push(maxPrice);
+  }
+
+  // Build the WHERE clause only when filters exist.
+  if (conditions.length) {
+    whereClause = `WHERE ${conditions.join(" AND ")}`;
+  }
+
   try {
-    const [rows] = await pool.query("SELECT * FROM products");
+    // Execute the query with parameterized values.
+    const [rows] = await pool.query(
+      `SELECT * FROM products ${whereClause}`,
+      values,
+    );
+
     res.status(200).json(rows);
   } catch (error) {
     console.error(error);
