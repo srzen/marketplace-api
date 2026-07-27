@@ -6,19 +6,18 @@ const pool = require("../db/pool");
 
 // GET /orders
 // Retrieve and return all orders from the database.
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
     const [rows] = await pool.query("SELECT * FROM orders");
     res.status(200).json(rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 });
 
 // GET /orders/:id
 // Retrieve a single order by its ID.
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const [order] = await pool.query(
       `SELECT 
@@ -65,15 +64,14 @@ router.get("/:id", async (req, res) => {
       created_at: order[0].created_at,
       items: items,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 });
 
 // POST /orders
 // Create a new order after validating the request body.
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   // Ensure all required fields are provided.
   if (
     !req.body ||
@@ -154,11 +152,11 @@ router.post("/", async (req, res) => {
     res
       .status(201)
       .json({ message: "Order created successfully", id: result.insertId });
-  } catch (error) {
+  } catch (err) {
     // Revert all database changes if a step fails.
     await connection.rollback();
-    console.error("Transaction failed. All changes rolled back: ", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Transaction failed. All changes rolled back: ", err);
+    next(err);
   } finally {
     connection.release();
   }
@@ -166,7 +164,7 @@ router.post("/", async (req, res) => {
 
 // PATCH /orders/:id
 // Update one or more order fields without replacing the entire record.
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", async (req, res, next) => {
   const cols = [];
   const values = [];
 
@@ -226,9 +224,8 @@ router.patch("/:id", async (req, res) => {
       res
         .status(200)
         .json({ message: "Order updated successfully", id: req.params.id });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+    } catch (err) {
+      next(err);
     }
   } else {
     return res.status(400).json({ error: "Body missing a required field" });
@@ -237,7 +234,7 @@ router.patch("/:id", async (req, res) => {
 
 // DELETE /orders/:id
 // Remove an order from the databse.
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const [result] = await pool.query("DELETE FROM orders WHERE id = ?", [
       req.params.id,
@@ -253,9 +250,8 @@ router.delete("/:id", async (req, res) => {
     res
       .status(200)
       .json({ message: "Order deleted successfully", id: req.params.id });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 });
 
