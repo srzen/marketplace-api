@@ -3,6 +3,7 @@
 require("dotenv").config();
 
 const express = require("express");
+const errorHandler = require("./middleware/errorHandler");
 const app = express();
 const port = process.env.PORT || 3000;
 const pool = require("./db/pool");
@@ -22,6 +23,8 @@ app.get("/api/health", function (req, res) {
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+
+app.use(errorHandler);
 
 // Try to verify the database connection
 async function connectDatabase() {
