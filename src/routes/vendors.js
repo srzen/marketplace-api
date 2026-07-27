@@ -6,21 +6,18 @@ const pool = require("../db/pool");
 
 // GET /vendors
 // Retrieve and return all vendors from the database.
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
     const [rows] = await pool.query("SELECT * FROM vendors");
     res.status(200).json(rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: "Internal server error",
-    });
+  } catch (err) {
+    next(err);
   }
 });
 
 // GET /vendors/:id
 // Retrieve a single vendor by its ID.
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const [vendor] = await pool.query("SELECT * FROM vendors WHERE id = ?", [
       req.params.id,
@@ -34,15 +31,14 @@ router.get("/:id", async (req, res) => {
     }
 
     res.status(200).json(vendor[0]);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 });
 
 // POST /vendors
 // Create a new vendor after validating the request body.
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   // Ensure all required fields are provided.
   if (!req.body || !req.body.name || !req.body.email || !req.body.phone) {
     return res.status(400).json({ error: "Body missing a required field" });
@@ -67,15 +63,14 @@ router.post("/", async (req, res) => {
     res
       .status(201)
       .json({ message: "Vendor created successfully", id: result.insertId });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 });
 
 // PATCH /vendors/:id
 // Update one or more vendor fields without replacing the entire record.
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", async (req, res, next) => {
   const cols = [];
   const values = [];
 
@@ -112,9 +107,8 @@ router.patch("/:id", async (req, res) => {
       res
         .status(200)
         .json({ message: "Vendor updated successfully", id: req.params.id });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+    } catch (err) {
+      next(err);
     }
   } else {
     return res.status(400).json({ error: "Body missing a required field" });
@@ -123,7 +117,7 @@ router.patch("/:id", async (req, res) => {
 
 // DELETE /vendors/:id
 // Remove a vendor from the database.
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const [result] = await pool.query("DELETE FROM vendors WHERE id = ?", [
       req.params.id,
@@ -139,9 +133,8 @@ router.delete("/:id", async (req, res) => {
     res
       .status(200)
       .json({ message: "Vendor deleted successfully", id: req.params.id });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 });
 
