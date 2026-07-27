@@ -24,6 +24,14 @@ app.use("/api/vendors", vendorRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 
+// No route matched
+app.use((req, res) => {
+  res.status(404).json({
+    error: "Route not found",
+  });
+});
+
+// Unexpected errors
 app.use(errorHandler);
 
 // Try to verify the database connection
