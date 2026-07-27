@@ -6,7 +6,7 @@ const pool = require("../db/pool");
 
 // GET /products
 // Retrieve products, with optional filtering by vendor_id and/or max_price.
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   const conditions = [];
   const values = [];
   let whereClause = "";
@@ -44,17 +44,14 @@ router.get("/", async (req, res) => {
     );
 
     res.status(200).json(rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: "Internal server error",
-    });
+  } catch (err) {
+    next(err);
   }
 });
 
 // GET /products/:id
 // Retrieve a single product by its ID.
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const [product] = await pool.query("SELECT * FROM products WHERE id = ?", [
       req.params.id,
@@ -68,15 +65,14 @@ router.get("/:id", async (req, res) => {
     }
 
     res.status(200).json(product[0]);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 });
 
 // POST /products
 // Create a new product after validating the request body.
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   // Ensure all required fields are provided.
   if (
     !req.body ||
@@ -114,15 +110,14 @@ router.post("/", async (req, res) => {
     res
       .status(201)
       .json({ message: "Product created successfully", id: result.insertId });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 });
 
 // PATCH /products/:id
 // Update one or more product fields without replacing the entire record.
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", async (req, res, next) => {
   const cols = [];
   const values = [];
 
@@ -159,9 +154,8 @@ router.patch("/:id", async (req, res) => {
       res
         .status(200)
         .json({ message: "Product updated successfully", id: req.params.id });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+    } catch (err) {
+      next(err);
     }
   } else {
     return res.status(400).json({ error: "Body missing a required field" });
@@ -170,7 +164,7 @@ router.patch("/:id", async (req, res) => {
 
 // DELETE /products/:id
 // Remove a product from the database
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const [result] = await pool.query("DELETE FROM products WHERE id = ?", [
       req.params.id,
@@ -187,9 +181,8 @@ router.delete("/:id", async (req, res) => {
       message: "Product deleted succesfully",
       id: req.params.id,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 });
 
