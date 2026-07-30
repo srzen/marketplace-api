@@ -4,6 +4,9 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../db/pool");
 
+const NotFoundError = require("../errors/NotFoundError");
+const ValidationError = require("../errors/ValidationError");
+
 // GET /vendors
 // Retrieve and return all vendors from the database.
 router.get("/", async (req, res, next) => {
@@ -23,11 +26,9 @@ router.get("/:id", async (req, res, next) => {
       req.params.id,
     ]);
 
-    // Return 404 if no vendor exists with the provided ID.
+    // Return NotFoundError if no vendor exists with the provided ID.
     if (!vendor.length) {
-      return res
-        .status(404)
-        .json({ error: "Vendor not found", id: req.params.id });
+      return next(new NotFoundError("Vendor not found."));
     }
 
     res.status(200).json(vendor[0]);
@@ -39,22 +40,22 @@ router.get("/:id", async (req, res, next) => {
 // POST /vendors
 // Create a new vendor after validating the request body.
 router.post("/", async (req, res, next) => {
-  // Ensure all required fields are provided.
-  if (!req.body || !req.body.name || !req.body.email || !req.body.phone) {
-    return res.status(400).json({ error: "Body missing a required field" });
-  }
-
-  // Only allow the expected vendor properties.
-  const allowedKeys = ["name", "email", "phone"];
-
-  // Validate every submitted field.
-  for (const [key, value] of Object.entries(req.body)) {
-    if (!validateInput(value) || !allowedKeys.includes(key)) {
-      return res.status(400).json({ error: "Invalid request body" });
-    }
-  }
-
   try {
+    // Ensure all required fields are provided.
+    if (!req.body || !req.body.name || !req.body.email || !req.body.phone) {
+      return next(new ValidationError("Body missing a required field."));
+    }
+
+    // Only allow the expected vendor properties.
+    const allowedKeys = ["name", "email", "phone"];
+
+    // Validate every submitted field.
+    for (const [key, value] of Object.entries(req.body)) {
+      if (!validateInput(value) || !allowedKeys.includes(key)) {
+        return next(new ValidationError("Invalid request body."));
+      }
+    }
+
     const [result] = await pool.query(
       "INSERT INTO vendors (name, email, phone) VALUES (?, ?, ?)",
       [req.body.name, req.body.email, req.body.phone],
@@ -62,7 +63,7 @@ router.post("/", async (req, res, next) => {
 
     res
       .status(201)
-      .json({ message: "Vendor created successfully", id: result.insertId });
+      .json({ message: "Vendor created successfully.", id: result.insertId });
   } catch (err) {
     next(err);
   }
@@ -71,27 +72,27 @@ router.post("/", async (req, res, next) => {
 // PATCH /vendors/:id
 // Update one or more vendor fields without replacing the entire record.
 router.patch("/:id", async (req, res, next) => {
-  const cols = [];
-  const values = [];
+  try {
+    const cols = [];
+    const values = [];
 
-  // Fields that clients are allowed to update.
-  const allowedKeys = ["name", "email", "phone"];
+    // Fields that clients are allowed to update.
+    const allowedKeys = ["name", "email", "phone"];
 
-  const body = req.body ?? {};
+    const body = req.body ?? {};
 
-  // Validate the request body while building the dynamic UPDATE query.
-  for (const [key, value] of Object.entries(body)) {
-    if (!validateInput(value) || !allowedKeys.includes(key)) {
-      return res.status(400).json({ error: "Invalid request body" });
+    // Validate the request body while building the dynamic UPDATE query.
+    for (const [key, value] of Object.entries(body)) {
+      if (!validateInput(value) || !allowedKeys.includes(key)) {
+        return next(new ValidationError("Invalid request body."));
+      }
+
+      cols.push(`${key} = ?`);
+      values.push(value);
     }
 
-    cols.push(`${key} = ?`);
-    values.push(value);
-  }
-
-  // At least one valid field must be supplied for PATCH.
-  if (cols.length && values.length) {
-    try {
+    // At least one valid field must be supplied for PATCH.
+    if (cols.length && values.length) {
       const [result] = await pool.query(
         `UPDATE vendors SET ${cols.join(", ")} WHERE id = ?`,
         [...values, req.params.id],
@@ -99,19 +100,18 @@ router.patch("/:id", async (req, res, next) => {
 
       // If no rows were updated, the vendor ID doesn't exist.
       if (!result.affectedRows) {
-        return res
-          .status(404)
-          .json({ error: "Vendor not found", id: req.params.id });
+        return next(new NotFoundError("Vendor not found."));
       }
 
-      res
-        .status(200)
-        .json({ message: "Vendor updated successfully", id: req.params.id });
-    } catch (err) {
-      next(err);
+      res.status(200).json({
+        message: "Vendor updated successfully.",
+        id: req.params.id,
+      });
+    } else {
+      return next(new ValidationError("Body missing a required field."));
     }
-  } else {
-    return res.status(400).json({ error: "Body missing a required field" });
+  } catch (err) {
+    next(err);
   }
 });
 
@@ -123,16 +123,14 @@ router.delete("/:id", async (req, res, next) => {
       req.params.id,
     ]);
 
-    // Return 404 if the vendor does not exist.
+    // Return NotFoundError if the vendor does not exist.
     if (!result.affectedRows) {
-      return res
-        .status(404)
-        .json({ error: "Vendor not found", id: req.params.id });
+      return next(new NotFoundError("Vendor not found."));
     }
 
     res
       .status(200)
-      .json({ message: "Vendor deleted successfully", id: req.params.id });
+      .json({ message: "Vendor deleted successfully.", id: req.params.id });
   } catch (err) {
     next(err);
   }
