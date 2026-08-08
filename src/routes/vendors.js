@@ -1,4 +1,4 @@
-// vendors.js
+// vendors.js: CRUD operations for vendor resources.
 
 const express = require("express");
 const router = express.Router();

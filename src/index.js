@@ -1,4 +1,4 @@
-// index.js
+// index.js: Express application setup and middleware/route registration.
 
 require("dotenv").config();
 

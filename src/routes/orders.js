@@ -1,4 +1,4 @@
-// orders.js
+// orders.js: order creation, retrieval, updates, and deletion.
 
 const express = require("express");
 const router = express.Router();

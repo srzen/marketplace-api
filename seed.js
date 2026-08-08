@@ -1,4 +1,6 @@
-// seed.js
+// seed.js: This script seeds the MySQL database with sample data for vendors, products, orders, and order items.
+// It first clears existing data in a dependency order to avoid foreign key violations, then inserts new records.
+// The script prompts the user for confirmation before proceeding with the destructive operation.
 
 require("dotenv").config();
 

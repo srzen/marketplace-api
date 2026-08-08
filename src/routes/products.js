@@ -1,4 +1,4 @@
-// products.js
+// products.js: CRUD operations and query filtering for products.
 
 const express = require("express");
 const router = express.Router();

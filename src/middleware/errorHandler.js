@@ -1,4 +1,4 @@
-// errorHandler.js
+// errorHandler.js: Error handling middleware to centralize error responses and logging.
 
 const errorHandler = (err, req, res, next) => {
   const status = err.status || 500;
