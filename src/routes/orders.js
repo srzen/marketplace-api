@@ -73,6 +73,7 @@ router.get("/:id", async (req, res, next) => {
 // POST /orders
 // Create a new order after validating the request body.
 router.post("/", async (req, res, next) => {
+  let connection;
   try {
     // Ensure all required fields are provided.
     if (
@@ -125,7 +126,7 @@ router.post("/", async (req, res, next) => {
       );
     }
 
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     // Get a connection to database transaction.
     await connection.beginTransaction();
 
@@ -159,7 +160,7 @@ router.post("/", async (req, res, next) => {
     console.error("Transaction failed. All changes rolled back: ", err);
     next(err);
   } finally {
-    connection.release();
+    connection?.release();
   }
 });
 
