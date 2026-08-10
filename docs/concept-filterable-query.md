@@ -1,3 +1,5 @@
+# Filterable Query
+
 We have a filterable query for retrieving products, which allows clients to filter by vendor and maximum price. These filters are optional. Clients can choose to fetch products either with or without using these filters, all through the same REST endpoint.
 
 GET /api/products

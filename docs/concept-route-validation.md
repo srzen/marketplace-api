@@ -1,1 +1,3 @@
+# Route Validation
+
 For this project, keeping validation inside each route is reasonable because the validation rules are closely tied to each endpoint and help illustrate the concepts. As the application grows and validation becomes repetitive, extracting it into reusable functions or middleware improves maintainability and reduces duplication. In production applications, schema validation libraries such as Joi or Zod are commonly used as middleware for this purpose.
