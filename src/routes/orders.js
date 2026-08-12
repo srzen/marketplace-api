@@ -4,21 +4,23 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../db/pool");
 
+const NotFoundError = require("../errors/NotFoundError");
+const ValidationError = require("../errors/ValidationError");
+
 // GET /orders
 // Retrieve and return all orders from the database.
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
     const [rows] = await pool.query("SELECT * FROM orders");
     res.status(200).json(rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 });
 
 // GET /orders/:id
 // Retrieve a single order by its ID.
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const [order] = await pool.query(
       `SELECT 
@@ -42,11 +44,9 @@ router.get("/:id", async (req, res) => {
       [req.params.id],
     );
 
-    // Return 404 if no order exists with the provided ID.
+    // Return NotFoundError if no order exists with the provided ID.
     if (!order.length) {
-      return res
-        .status(404)
-        .json({ error: "Order not found", id: req.params.id });
+      return next(new NotFoundError("Order not found."));
     }
     const items = order.map((item) => ({
       product_id: item.product_id,
@@ -65,68 +65,67 @@ router.get("/:id", async (req, res) => {
       created_at: order[0].created_at,
       items: items,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 });
 
 // POST /orders
 // Create a new order after validating the request body.
-router.post("/", async (req, res) => {
-  // Ensure all required fields are provided.
-  if (
-    !req.body ||
-    !req.body.customer_email ||
-    !req.body.shipping_address ||
-    !Array.isArray(req.body.items) ||
-    !req.body.items.length ||
-    req.body.items.some((item) =>
-      ["product_id", "quantity"].some((field) => !item[field]),
-    )
-  ) {
-    return res.status(400).json({ error: "Body missing a required field" });
-  }
-
-  // Only allow expected product properties.
-  const allowedBodyKeys = ["customer_email", "shipping_address", "items"];
-  const allowedItemKeys = ["product_id", "quantity"];
-
-  // Validate submitted fields.
-  for (const [key, value] of Object.entries(req.body)) {
-    if (!validateInput(value) || !allowedBodyKeys.includes(key)) {
-      return res.status(400).json({ error: "Invalid request body" });
+router.post("/", async (req, res, next) => {
+  try {
+    // Ensure all required fields are provided.
+    if (
+      !req.body ||
+      !req.body.customer_email ||
+      !req.body.shipping_address ||
+      !Array.isArray(req.body.items) ||
+      !req.body.items.length ||
+      req.body.items.some((item) =>
+        ["product_id", "quantity"].some((field) => !item[field]),
+      )
+    ) {
+      return next(new ValidationError("Body missing a required field."));
     }
-  }
 
-  for (const item of req.body.items) {
-    for (const [key, value] of Object.entries(item)) {
-      if (!validateInput(value) || !allowedItemKeys.includes(key)) {
-        return res.status(400).json({ error: "Invalid item" });
+    // Only allow expected product properties.
+    const allowedBodyKeys = ["customer_email", "shipping_address", "items"];
+    const allowedItemKeys = ["product_id", "quantity"];
+
+    // Validate submitted fields.
+    for (const [key, value] of Object.entries(req.body)) {
+      if (!validateInput(value) || !allowedBodyKeys.includes(key)) {
+        return next(new ValidationError("Invalid request body."));
       }
     }
-  }
 
-  // Check all the products are exist and active.
-  const productIds = req.body.items.map((item) => item.product_id);
-  const [products] = await pool.query(
-    "SELECT id, price FROM products WHERE id IN (?) AND is_active = TRUE",
-    [productIds],
-  );
+    for (const item of req.body.items) {
+      for (const [key, value] of Object.entries(item)) {
+        if (!validateInput(value) || !allowedItemKeys.includes(key)) {
+          return next(new ValidationError("Invalid item."));
+        }
+      }
+    }
 
-  // Check for duplicate products before comparing with DB.
-  if (new Set(productIds).size !== productIds.length) {
-    return res.status(400).json({ error: "Items have duplicate products." });
-  }
+    // Check all the products are exist and active.
+    const productIds = req.body.items.map((item) => item.product_id);
+    const [products] = await pool.query(
+      "SELECT id, price FROM products WHERE id IN (?) AND is_active = TRUE",
+      [productIds],
+    );
 
-  if (products.length !== productIds.length) {
-    return res
-      .status(400)
-      .json({ error: "One or more requested products are unavailable." });
-  }
+    // Check for duplicate products before comparing with DB.
+    if (new Set(productIds).size !== productIds.length) {
+      return next(new ValidationError("Items have duplicate products."));
+    }
 
-  const connection = await pool.getConnection();
-  try {
+    if (products.length !== productIds.length) {
+      return next(
+        new ValidationError("One or more requested products are unavailable."),
+      );
+    }
+
+    const connection = await pool.getConnection();
     // Get a connection to database transaction.
     await connection.beginTransaction();
 
@@ -153,12 +152,12 @@ router.post("/", async (req, res) => {
     await connection.commit();
     res
       .status(201)
-      .json({ message: "Order created successfully", id: result.insertId });
-  } catch (error) {
+      .json({ message: "Order created successfully.", id: result.insertId });
+  } catch (err) {
     // Revert all database changes if a step fails.
     await connection.rollback();
-    console.error("Transaction failed. All changes rolled back: ", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Transaction failed. All changes rolled back: ", err);
+    next(err);
   } finally {
     connection.release();
   }
@@ -166,51 +165,48 @@ router.post("/", async (req, res) => {
 
 // PATCH /orders/:id
 // Update one or more order fields without replacing the entire record.
-router.patch("/:id", async (req, res) => {
-  const cols = [];
-  const values = [];
+router.patch("/:id", async (req, res, next) => {
+  try {
+    const cols = [];
+    const values = [];
 
-  // Fields that clients are allowed to update.
-  const allowedKeys = ["customer_email", "shipping_address", "status"];
+    // Fields that clients are allowed to update.
+    const allowedKeys = ["customer_email", "shipping_address", "status"];
 
-  const body = req.body ?? {};
+    const body = req.body ?? {};
+    // Validate the request body while building the dynamic UPDATE query.
+    for (const [key, value] of Object.entries(body)) {
+      if (!validateInput(value) || !allowedKeys.includes(key)) {
+        return next(new ValidationError("Invalid request body."));
+      }
 
-  // Validate the request body while building the dynamic UPDATE query.
-  for (const [key, value] of Object.entries(body)) {
-    if (!validateInput(value) || !allowedKeys.includes(key)) {
-      return res.status(400).json({ error: "Invalid request body" });
+      cols.push(`${key} = ?`);
+      values.push(value);
     }
 
-    cols.push(`${key} = ?`);
-    values.push(value);
-  }
+    // Allow updates only while the order is Pending or Processing.
+    const [currentStatus] = await pool.query(
+      "SELECT status FROM orders WHERE id = ?",
+      [req.params.id],
+    );
 
-  // Allow updating customer info only while the order is Pending or Processing.
-  const [currentStatus] = await pool.query(
-    "SELECT status FROM orders WHERE id = ?",
-    [req.params.id],
-  );
+    // If no rows were returned, the order ID doesn't exist.
+    if (!currentStatus.length) {
+      return next(new NotFoundError("Order not found."));
+    }
 
-  // If no rows were returned, the order ID doesn't exist.
-  if (!currentStatus.length) {
-    return res
-      .status(404)
-      .json({ error: "Order not found", id: req.params.id });
-  }
+    if (
+      currentStatus[0].status !== "Pending" &&
+      currentStatus[0].status !== "Processing"
+    ) {
+      return res.status(409).json({
+        error: "Orders can't be updated after being processed.",
+        id: req.params.id,
+      });
+    }
 
-  if (
-    currentStatus[0].status !== "Pending" &&
-    currentStatus[0].status !== "Processing"
-  ) {
-    return res.status(409).json({
-      error: "Orders can't be updated after being processed.",
-      id: req.params.id,
-    });
-  }
-
-  // At least one valid field must be supplied for PATCH.
-  if (cols.length && values.length) {
-    try {
+    // At least one valid field must be supplied for PATCH.
+    if (cols.length && values.length) {
       const [result] = await pool.query(
         `UPDATE orders SET ${cols.join(", ")} WHERE id = ?`,
         [...values, req.params.id],
@@ -218,44 +214,38 @@ router.patch("/:id", async (req, res) => {
 
       // If no rows were updated, the order ID doesn't exist.
       if (!result.affectedRows) {
-        return res
-          .status(404)
-          .json({ error: "Order not found", id: req.params.id });
+        return next(new NotFoundError("Order not found."));
       }
 
       res
         .status(200)
-        .json({ message: "Order updated successfully", id: req.params.id });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+        .json({ message: "Order updated successfully.", id: req.params.id });
+    } else {
+      return next(new ValidationError("Body missing a required field."));
     }
-  } else {
-    return res.status(400).json({ error: "Body missing a required field" });
+  } catch (err) {
+    next(err);
   }
 });
 
 // DELETE /orders/:id
 // Remove an order from the databse.
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const [result] = await pool.query("DELETE FROM orders WHERE id = ?", [
       req.params.id,
     ]);
 
-    // Return 404 if the order does not exist.
+    // Return NotFoundError if the order does not exist.
     if (!result.affectedRows) {
-      return res
-        .status(404)
-        .json({ error: "Order not found", id: req.params.id });
+      return next(new NotFoundError("Order not found."));
     }
 
     res
       .status(200)
-      .json({ message: "Order deleted successfully", id: req.params.id });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+      .json({ message: "Order deleted successfully.", id: req.params.id });
+  } catch (err) {
+    next(err);
   }
 });
 
