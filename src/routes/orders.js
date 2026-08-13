@@ -156,8 +156,10 @@ router.post("/", async (req, res, next) => {
       .json({ message: "Order created successfully.", id: result.insertId });
   } catch (err) {
     // Revert all database changes if a step fails.
-    await connection.rollback();
-    console.error("Transaction failed. All changes rolled back: ", err);
+    if (connection) {
+      await connection.rollback();
+      console.error("Transaction failed. All changes rolled back: ", err);
+    }
     next(err);
   } finally {
     connection?.release();
