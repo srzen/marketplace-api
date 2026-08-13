@@ -108,17 +108,18 @@ router.post("/", async (req, res, next) => {
       }
     }
 
-    // Check all the products are exist and active.
     const productIds = req.body.items.map((item) => item.product_id);
-    const [products] = await pool.query(
-      "SELECT id, price FROM products WHERE id IN (?) AND is_active = TRUE",
-      [productIds],
-    );
 
     // Check for duplicate products before comparing with DB.
     if (new Set(productIds).size !== productIds.length) {
       return next(new ValidationError("Items have duplicate products."));
     }
+
+    // Check all the products are exist and active.
+    const [products] = await pool.query(
+      "SELECT id, price FROM products WHERE id IN (?) AND is_active = TRUE",
+      [productIds],
+    );
 
     if (products.length !== productIds.length) {
       return next(
