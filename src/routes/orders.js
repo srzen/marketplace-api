@@ -1,4 +1,4 @@
-// orders.js: order creation, retrieval, updates, and deletion.
+// orders.js: Order creation, retrieval, updates, and deletion.
 
 const express = require("express");
 const router = express.Router();
@@ -234,7 +234,7 @@ router.patch("/:id", async (req, res, next) => {
 });
 
 // DELETE /orders/:id
-// Remove an order from the databse.
+// Remove an order from the database.
 router.delete("/:id", async (req, res, next) => {
   try {
     const [result] = await pool.query("DELETE FROM orders WHERE id = ?", [
