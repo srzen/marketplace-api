@@ -1,7 +1,5 @@
 // pool.js: Create a MySQL connection pool for efficient database interactions.
 
-require("dotenv").config();
-
 const mysql = require("mysql2/promise");
 
 // Create a connection pool for interacting with the MySQL database.
