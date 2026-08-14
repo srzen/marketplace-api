@@ -1,4 +1,4 @@
-// ValidationError.js: Custom error class for handling validation errors in the application.
+// ValidationError.js: Custom error class for handling 400 Validation errors in the application.
 
 class ValidationError extends Error {
   constructor(message = "Invalid input provided.") {

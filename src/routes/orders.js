@@ -7,6 +7,7 @@ const validateInput = require("../utils/validateInput");
 
 const NotFoundError = require("../errors/NotFoundError");
 const ValidationError = require("../errors/ValidationError");
+const ConflictError = require("../errors/ConflictError");
 
 // GET /orders
 // Retrieve and return all orders from the database.
@@ -204,10 +205,9 @@ router.patch("/:id", async (req, res, next) => {
       currentStatus[0].status !== "Pending" &&
       currentStatus[0].status !== "Processing"
     ) {
-      return res.status(409).json({
-        error: "Orders can't be updated after being processed.",
-        id: req.params.id,
-      });
+      return next(
+        new ConflictError("Orders can't be updated after being processed."),
+      );
     }
 
     // At least one valid field must be supplied for PATCH.
