@@ -1,8 +1,9 @@
-// vendors.js
+// vendors.js: CRUD operations for vendor resources.
 
 const express = require("express");
 const router = express.Router();
 const pool = require("../db/pool");
+const validateInput = require("../utils/validateInput");
 
 const NotFoundError = require("../errors/NotFoundError");
 const ValidationError = require("../errors/ValidationError");
@@ -135,16 +136,5 @@ router.delete("/:id", async (req, res, next) => {
     next(err);
   }
 });
-
-// Returns true if the input is a non-empty string after trimming whitespace.
-function validateInput(input) {
-  let inputIsValid = true;
-
-  if (!input?.trim()) {
-    inputIsValid = false;
-  }
-
-  return inputIsValid;
-}
 
 module.exports = router;

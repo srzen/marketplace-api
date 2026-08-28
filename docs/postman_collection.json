@@ -10,69 +10,52 @@
       "name": "VENDORS",
       "item": [
         {
-          "name": "/api/vendors",
+          "name": "/vendors",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
               "raw": "http://localhost:3000/api/vendors",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "vendors"
-              ]
+              "path": ["api", "vendors"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/vendors/1",
+          "name": "/vendors/:id",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
               "raw": "http://localhost:3000/api/vendors/1",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "vendors",
-                "1"
-              ]
+              "path": ["api", "vendors", "1"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/vendors/999 - Not Found",
+          "name": "/vendors/:id (missing)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
               "raw": "http://localhost:3000/api/vendors/999",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "vendors",
-                "999"
-              ]
+              "path": ["api", "vendors", "999"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/vendors",
+          "name": "/vendors",
           "request": {
             "auth": {
               "type": "noauth"
@@ -81,7 +64,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\":\"John Doe\"\r\n}",
+              "raw": "{\r\n    \"name\":\"Jane Doe\",\r\n    \"email\": \"jane@doe.com\",\r\n    \"phone\": \"+1234567890\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -91,20 +74,15 @@
             "url": {
               "raw": "http://localhost:3000/api/vendors",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "vendors"
-              ]
+              "path": ["api", "vendors"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/vendors - Invalid",
+          "name": "/vendors (invalid)",
           "request": {
             "auth": {
               "type": "noauth"
@@ -113,7 +91,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\":\"\"\r\n}",
+              "raw": "{\r\n    \"name\":\"\",\r\n    \"email\": null,\r\n    \"phone\":\"+123456789\",\r\n    \"apple\":\"two\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -123,20 +101,15 @@
             "url": {
               "raw": "http://localhost:3000/api/vendors",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "vendors"
-              ]
+              "path": ["api", "vendors"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/vendors/1",
+          "name": "/vendors/:id",
           "request": {
             "auth": {
               "type": "noauth"
@@ -145,26 +118,79 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{\r\n    \"name\": \"John Doeee\",\r\n    \"email\": \"john@doeee.com\",\r\n    \"phone\": \"+1234567890\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
-              "raw": "http://localhost:3000/api/vendors/1",
+              "raw": "http://localhost:3000/api/vendors/4",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "vendors",
-                "1"
-              ]
+              "path": ["api", "vendors", "4"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/vendors/1",
+          "name": "/vendors/:id (missing)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"John Doeee\",\r\n    \"email\": \"john@doeee.com\",\r\n    \"phone\": \"+1234567890\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/vendors/999",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vendors", "999"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/vendors/:id (invalid)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"John Doeee\",\r\n    \"email\": null\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/vendors/4",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vendors", "4"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/vendors/:id",
           "request": {
             "auth": {
               "type": "noauth"
@@ -176,17 +202,33 @@
               "raw": ""
             },
             "url": {
-              "raw": "http://localhost:3000/api/vendors/1",
+              "raw": "http://localhost:3000/api/vendors/4",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "vendors",
-                "1"
-              ]
+              "path": ["api", "vendors", "4"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/vendors/:id (missing)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/vendors/999",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vendors", "999"]
             }
           },
           "response": []
@@ -197,79 +239,77 @@
       "name": "PRODUCTS",
       "item": [
         {
-          "name": "/api/products",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
+          "name": "/products",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
             "url": {
               "raw": "http://localhost:3000/api/products",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "products"
+              "path": ["api", "products"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/products (filtered)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/products?vendor_id=1&max_price=80",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "vendor_id",
+                  "value": "1"
+                },
+                {
+                  "key": "max_price",
+                  "value": "80"
+                }
               ]
             }
           },
           "response": []
         },
         {
-          "name": "/api/products/1",
+          "name": "/products/:id",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
               "raw": "http://localhost:3000/api/products/1",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "products",
-                "1"
-              ]
+              "path": ["api", "products", "1"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/products/1 - Not Found",
+          "name": "/products/:id (missing)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
               "raw": "http://localhost:3000/api/products/999",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "products",
-                "999"
-              ]
+              "path": ["api", "products", "999"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/products",
+          "name": "/products",
           "request": {
             "auth": {
               "type": "noauth"
@@ -278,7 +318,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"Example Product\"\r\n}",
+              "raw": "{\r\n    \"name\":\"Example Product\",\r\n    \"description\": \"Example Product Description\",\r\n    \"price\": \"119.99\",\r\n    \"stock\":\"15\",\r\n    \"vendor_id\":\"3\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -288,20 +328,15 @@
             "url": {
               "raw": "http://localhost:3000/api/products",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "products"
-              ]
+              "path": ["api", "products"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/products - Invalid",
+          "name": "/products(invalid)",
           "request": {
             "auth": {
               "type": "noauth"
@@ -310,46 +345,106 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{\r\n    \"name\":\"Example Product\",\r\n    \"description\": \"Example Product Description\",\r\n    \"price\": \"119.99\",\r\n    \"vendor_id\":\"58\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "http://localhost:3000/api/products",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "products"
-              ]
+              "path": ["api", "products"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/products/1",
+          "name": "/products/:id",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "PATCH",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"Example Product Edited\",\r\n    \"description\": \"Example Product Description Edited\",\r\n    \"price\": \"129.99\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "http://localhost:3000/api/products/1",
+              "raw": "http://localhost:3000/api/products/13",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "products",
-                "1"
-              ]
+              "path": ["api", "products", "13"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/products/1",
+          "name": "/products/:id (missing)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"Example Product Edited\",\r\n    \"description\": \"Example Product Description Edited\",\r\n    \"price\": \"129.99\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/products/999",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "products", "999"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/products/:id (invalid)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"Example Product Edited\",\r\n    \"description\": \"Example Product Description Edited\",\r\n    \"price\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/products/13",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "products", "13"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/products/:id",
           "request": {
             "auth": {
               "type": "noauth"
@@ -361,17 +456,33 @@
               "raw": ""
             },
             "url": {
-              "raw": "http://localhost:3000/api/products/1",
+              "raw": "http://localhost:3000/api/products/13",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "products",
-                "1"
-              ]
+              "path": ["api", "products", "13"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/products/:id (missing)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/products/999",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "products", "999"]
             }
           },
           "response": []
@@ -382,85 +493,52 @@
       "name": "ORDERS",
       "item": [
         {
-          "name": "/api/orders",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
+          "name": "/orders",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
             "url": {
               "raw": "http://localhost:3000/api/orders",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "orders"
-              ]
+              "path": ["api", "orders"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/orders/1",
+          "name": "/orders/:id",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/api/orders/1",
+              "raw": "http://localhost:3000/api/orders/3",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "orders",
-                "1"
-              ]
+              "path": ["api", "orders", "3"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/orders/1 - Not Found",
+          "name": "/orders/:id (missing)",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "http://localhost:3000/api/orders/999",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "orders",
-                "999"
-              ]
+              "path": ["api", "orders", "999"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/orders",
+          "name": "/orders",
           "request": {
             "auth": {
               "type": "noauth"
@@ -469,7 +547,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"vendorId\": \"10\"\r\n}",
+              "raw": "{\r\n    \"customer_email\": \"john@doe.com\",\r\n    \"shipping_address\": \"Main Street, New York\",\r\n    \"items\": [\r\n        {\r\n            \"product_id\": 4,\r\n            \"quantity\": 2\r\n        },\r\n        {\r\n            \"product_id\": 8,\r\n            \"quantity\": 3\r\n        }\r\n    ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -479,20 +557,15 @@
             "url": {
               "raw": "http://localhost:3000/api/orders",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "orders"
-              ]
+              "path": ["api", "orders"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/orders - Invalid",
+          "name": "/orders(invalid)",
           "request": {
             "auth": {
               "type": "noauth"
@@ -501,7 +574,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{}",
+              "raw": "{\r\n    \"customer_email\": \"john@doe.com\",\r\n    \"shipping_address\": \"\",\r\n    \"items\": [\r\n        {\r\n            \"product_id\": 4,\r\n            \"quantity\": 5\r\n        }\r\n    ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -511,20 +584,15 @@
             "url": {
               "raw": "http://localhost:3000/api/orders",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "orders"
-              ]
+              "path": ["api", "orders"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/orders/1",
+          "name": "/orders/:id",
           "request": {
             "auth": {
               "type": "noauth"
@@ -533,26 +601,79 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{\r\n    \"customer_email\": \"jane@doe.com\",\r\n    \"shipping_address\":\"First Lane, Los Angeles\",\r\n    \"status\":\"Delivered\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
-              "raw": "http://localhost:3000/api/orders/1",
+              "raw": "http://localhost:3000/api/orders/4",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "orders",
-                "1"
-              ]
+              "path": ["api", "orders", "4"]
             }
           },
           "response": []
         },
         {
-          "name": "/api/orders/1",
+          "name": "/orders/:id (missing)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"customer_email\": \"jane@doe.com\",\r\n    \"shipping_address\":\"First Lane, Los Angeles\",\r\n    \"status\":\"Delivered\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/orders/999",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders", "999"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/orders/:id (invalid)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"customer_email\": \"jane@doe.com\",\r\n    \"shipping_address\":\"First Lane, Los Angeles\",\r\n    \"status\":\"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/orders/4",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders", "4"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/orders/:id",
           "request": {
             "auth": {
               "type": "noauth"
@@ -564,17 +685,33 @@
               "raw": ""
             },
             "url": {
-              "raw": "http://localhost:3000/api/orders/1",
+              "raw": "http://localhost:3000/api/orders/4",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "3000",
-              "path": [
-                "api",
-                "orders",
-                "1"
-              ]
+              "path": ["api", "orders", "4"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/orders/:id (missing)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/orders/999",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders", "999"]
             }
           },
           "response": []
@@ -589,14 +726,9 @@
         "url": {
           "raw": "http://localhost:3000/api/health",
           "protocol": "http",
-          "host": [
-            "localhost"
-          ],
+          "host": ["localhost"],
           "port": "3000",
-          "path": [
-            "api",
-            "health"
-          ]
+          "path": ["api", "health"]
         }
       },
       "response": []

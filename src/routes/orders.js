@@ -1,11 +1,13 @@
-// orders.js
+// orders.js: Order creation, retrieval, updates, and deletion.
 
 const express = require("express");
 const router = express.Router();
 const pool = require("../db/pool");
+const validateInput = require("../utils/validateInput");
 
 const NotFoundError = require("../errors/NotFoundError");
 const ValidationError = require("../errors/ValidationError");
+const ConflictError = require("../errors/ConflictError");
 
 // GET /orders
 // Retrieve and return all orders from the database.
@@ -73,6 +75,7 @@ router.get("/:id", async (req, res, next) => {
 // POST /orders
 // Create a new order after validating the request body.
 router.post("/", async (req, res, next) => {
+  let connection;
   try {
     // Ensure all required fields are provided.
     if (
@@ -107,17 +110,18 @@ router.post("/", async (req, res, next) => {
       }
     }
 
-    // Check all the products are exist and active.
     const productIds = req.body.items.map((item) => item.product_id);
-    const [products] = await pool.query(
-      "SELECT id, price FROM products WHERE id IN (?) AND is_active = TRUE",
-      [productIds],
-    );
 
     // Check for duplicate products before comparing with DB.
     if (new Set(productIds).size !== productIds.length) {
       return next(new ValidationError("Items have duplicate products."));
     }
+
+    // Check all the products are exist and active.
+    const [products] = await pool.query(
+      "SELECT id, price FROM products WHERE id IN (?) AND is_active = TRUE",
+      [productIds],
+    );
 
     if (products.length !== productIds.length) {
       return next(
@@ -125,7 +129,7 @@ router.post("/", async (req, res, next) => {
       );
     }
 
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     // Get a connection to database transaction.
     await connection.beginTransaction();
 
@@ -155,11 +159,13 @@ router.post("/", async (req, res, next) => {
       .json({ message: "Order created successfully.", id: result.insertId });
   } catch (err) {
     // Revert all database changes if a step fails.
-    await connection.rollback();
-    console.error("Transaction failed. All changes rolled back: ", err);
+    if (connection) {
+      await connection.rollback();
+      console.error("Transaction failed. All changes rolled back: ", err);
+    }
     next(err);
   } finally {
-    connection.release();
+    connection?.release();
   }
 });
 
@@ -199,10 +205,9 @@ router.patch("/:id", async (req, res, next) => {
       currentStatus[0].status !== "Pending" &&
       currentStatus[0].status !== "Processing"
     ) {
-      return res.status(409).json({
-        error: "Orders can't be updated after being processed.",
-        id: req.params.id,
-      });
+      return next(
+        new ConflictError("Orders can't be updated after being processed."),
+      );
     }
 
     // At least one valid field must be supplied for PATCH.
@@ -229,7 +234,7 @@ router.patch("/:id", async (req, res, next) => {
 });
 
 // DELETE /orders/:id
-// Remove an order from the databse.
+// Remove an order from the database.
 router.delete("/:id", async (req, res, next) => {
   try {
     const [result] = await pool.query("DELETE FROM orders WHERE id = ?", [
@@ -248,19 +253,5 @@ router.delete("/:id", async (req, res, next) => {
     next(err);
   }
 });
-
-// Returns true if the input is a valid number, a non-empty string
-// after trimming whitespace or a non-empty array.
-function validateInput(input) {
-  if (typeof input === "number") {
-    return input > 0;
-  } else if (typeof input === "string") {
-    return input.trim().length > 0;
-  } else if (typeof input === "object") {
-    return Array.isArray(input) && input.length > 0;
-  }
-
-  return false;
-}
 
 module.exports = router;
