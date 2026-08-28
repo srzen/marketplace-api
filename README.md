@@ -2,10 +2,7 @@
 
 A Node.js/Express REST API for a multi-vendor marketplace: vendors list products, customers place orders, and each order can contain products from one or more vendors.
 
-<video autoplay muted loop playsinline>
-  <source src="docs/marketplace_api.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+![](docs/marketplace_api.gif)
 
 ## About
 
