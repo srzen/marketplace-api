@@ -2,6 +2,11 @@
 
 A Node.js/Express REST API for a multi-vendor marketplace: vendors list products, customers place orders, and each order can contain products from one or more vendors.
 
+<video autoplay muted loop playsinline>
+  <source src="docs/marketplace_api.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 ## About
 
 This API models a small marketplace with four related tables (`vendors`, `products`, `orders`, `order_items`). It is a learning-focused backend: CRUD for each resource, parameterized SQL, request validation, centralized error handling, and transactions where a single action must write more than one row.
@@ -153,16 +158,16 @@ flowchart TD
 
 Shorter write-ups of individual ideas used in this project:
 
-- [Relational schema design](docs/concept-schema-design.md) — tables, keys, and delete behavior
-- [HTTP status codes](docs/concept-http-status-codes.md) — `200`, `201`, `400`, `404`
-- [SQL joins](docs/concept-sql-joins.md) — order detail query across four tables
-- [Database transactions](docs/concept-db-transactions.md) — seed script and `POST /orders`
-- [Filterable queries](docs/concept-filterable-query.md) — `vendor_id` and `max_price` on products
-- [Route validation](docs/concept-route-validation.md) — manual checks before a schema library
-- [Error handling](docs/concept-error-handling.md) — centralized middleware and custom errors
-- [Middleware chain](docs/concept-middleware-chain-design.md) — registration order and `next(err)`
-- [Server deployment](docs/concept-server-deployment.md) — Linux VPS, NVM, MySQL, firewall
-- [Persistent service](docs/concept-persistent-service.md) — PM2 and systemd
+- [Relational schema design](docs/concept-schema-design.md) - tables, keys, and delete behavior
+- [HTTP status codes](docs/concept-http-status-codes.md) - `200`, `201`, `400`, `404`
+- [SQL joins](docs/concept-sql-joins.md) - order detail query across four tables
+- [Database transactions](docs/concept-db-transactions.md) - seed script and `POST /orders`
+- [Filterable queries](docs/concept-filterable-query.md) - `vendor_id` and `max_price` on products
+- [Route validation](docs/concept-route-validation.md) - manual checks before a schema library
+- [Error handling](docs/concept-error-handling.md) - centralized middleware and custom errors
+- [Middleware chain](docs/concept-middleware-chain-design.md) - registration order and `next(err)`
+- [Server deployment](docs/concept-server-deployment.md) - Linux VPS, NVM, MySQL, firewall
+- [Persistent service](docs/concept-persistent-service.md) - PM2 and systemd
 
 ## Key Features
 
