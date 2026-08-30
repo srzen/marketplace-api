@@ -54,17 +54,19 @@ flowchart TD
 
     B -->|Validation Failed| C["next(new ValidationError)"]
     B -->|Resource Not Found| D["next(new NotFoundError)"]
-    B -->|Unexpected Exception| E["catch(err)"]
+    B -->|Conflict Detected| E["next(new ConflictError)"]
+    B -->|Unexpected Exception| F["catch(err)"]
 
-    E --> F["next(err)"]
+    F --> G["next(err)"]
 
-    C --> G[Centralized Error Handler]
-    D --> G
-    F --> G
+    C --> H[Centralized Error Handler]
+    D --> H
+    E --> H
+    G --> H
 
-    G --> H[Read status]
-    H --> I[Log Error]
-    I --> J[Return JSON Response]
+    H --> I[Read status]
+    I --> J[Log Error]
+    J --> K[Return JSON Response]
 ```
 
 ## Design Decisions
