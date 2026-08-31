@@ -15,3 +15,11 @@ Used when the server cannot process a request because required input is missing 
 ## 404 Not Found
 
 Used when the requested resource does not exist on the server. For example, if a client requests a vendor ID that cannot be found, the server returns a `404 Not Found` response instead of a successful response.
+
+## 409 Conflict
+
+Used when a request cannot be completed due to a conflict with the current state of the resource. For example, if an order is no longer `Pending` or `Processing`, attempting to update it returns a `409 Conflict` response to indicate that the operation cannot be performed.
+
+## 500 Internal Server Error
+
+Used when the server encounters an unexpected condition that prevents it from fulfilling the request. This indicates a server-side error that is not the client's fault.

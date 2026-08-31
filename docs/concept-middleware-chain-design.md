@@ -77,7 +77,7 @@ Unexpected errors are forwarded to a single error-handling middleware using `nex
 
 ### Custom Error Classes
 
-Expected API errors are represented using custom error classes (`NotFoundError` and `ValidationError`). Each class extends JavaScript's built-in `Error` object and provides an HTTP `status`, allowing the error handler to generate the correct response without additional conditional logic.
+Expected API errors are represented using custom error classes (`NotFoundError`, `ValidationError`, `ConflictError`). Each class extends JavaScript's built-in `Error` object and provides an HTTP `status`, allowing the error handler to generate the correct response without additional conditional logic.
 
 ### Manual Request Validation
 

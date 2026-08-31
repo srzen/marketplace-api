@@ -4,7 +4,7 @@ Error handling was separated from normal request-processing logic by using centr
 
 Instead of every route having to implement the complete error-response strategy, route handlers can pass errors to the error middleware. The middleware then converts those errors into consistent HTTP responses.
 
-Extended NotFoundError and ValidationError classes provide the ability to attach message and status code information to errors.
+Extended NotFoundError, ValidationError, and ConflictError classes provide the ability to attach message and status code information to errors.
 
 This creates a separation of responsibilities:
 
