@@ -19,6 +19,34 @@ The [build log](BUILD-LOG.md) records the design decisions behind the schema, ro
 - Development server: nodemon
 - Manual testing: [Postman collection](docs/postman_collection.json)
 
+## Key Features
+
+- Full CRUD for vendors, products, and orders, with parameterized SQL to keep user input out of query strings
+- Product listing filters (`vendor_id`, `max_price`) built as a dynamic `WHERE` clause with matching `?` values
+- Order creation in a single transaction: parent order, trusted product prices from the database, then line items (rollback on failure)
+- Nested order-detail responses: one JOIN query, then mapped into `{ order, items[] }` JSON
+- Centralized errors (`400` / `404` / `409` / `500`) so clients always get `{ "error": "..." }`
+- Transactional seed script that respects foreign-key insert/delete order and asks before wiping data
+
+## Project Structure
+
+```
+marketplace-api/
+├── docs/                      # Concept notes, schema diagram, Postman collection
+├── src/
+│   ├── db/                    # MySQL connection pool
+│   ├── errors/                # NotFoundError, ValidationError, ConflictError
+│   ├── middleware/            # Centralized error handler
+│   ├── routes/                # vendors, products, orders
+│   ├── utils/                 # Shared input validation
+│   └── index.js               # App setup, routes, startup
+├── .env.example
+├── schema.sql
+├── seed.js
+├── BUILD-LOG.md
+└── README.md
+```
+
 ## Getting Started
 
 ### Prerequisites
@@ -96,25 +124,6 @@ All resource routes are prefixed with `/api`.
 
 Unknown paths return `404` with `{ "error": "Route not found" }`. Expected failures use custom error classes (`ValidationError`, `NotFoundError`, `ConflictError`) and a shared JSON `{ "error": "..." }` body.
 
-## Project Structure
-
-```
-marketplace-api/
-├── docs/                      # Concept notes, schema diagram, Postman collection
-├── src/
-│   ├── db/                    # MySQL connection pool
-│   ├── errors/                # NotFoundError, ValidationError, ConflictError
-│   ├── middleware/            # Centralized error handler
-│   ├── routes/                # vendors, products, orders
-│   ├── utils/                 # Shared input validation
-│   └── index.js               # App setup, routes, startup
-├── .env.example
-├── schema.sql
-├── seed.js
-├── BUILD-LOG.md
-└── README.md
-```
-
 ## Database Schema
 
 The executable schema is [`schema.sql`](schema.sql). Design notes, foreign keys, and delete rules are in [`docs/concept-schema-design.md`](docs/concept-schema-design.md).
@@ -156,7 +165,7 @@ flowchart TD
 Shorter write-ups of individual ideas used in this project:
 
 - [Relational schema design](docs/concept-schema-design.md) - tables, keys, and delete behavior
-- [HTTP status codes](docs/concept-http-status-codes.md) - `200`, `201`, `400`, `404`
+- [HTTP status codes](docs/concept-http-status-codes.md) - `200`, `201`, `400`, `404`, `409`, `500`
 - [SQL joins](docs/concept-sql-joins.md) - order detail query across four tables
 - [Database transactions](docs/concept-db-transactions.md) - seed script and `POST /orders`
 - [Filterable queries](docs/concept-filterable-query.md) - `vendor_id` and `max_price` on products
@@ -165,15 +174,6 @@ Shorter write-ups of individual ideas used in this project:
 - [Middleware chain](docs/concept-middleware-chain-design.md) - registration order and `next(err)`
 - [Server deployment](docs/concept-server-deployment.md) - Linux VPS, NVM, MySQL, firewall
 - [Persistent service](docs/concept-persistent-service.md) - PM2 and systemd
-
-## Key Features
-
-- Full CRUD for vendors, products, and orders, with parameterized SQL to keep user input out of query strings
-- Product listing filters (`vendor_id`, `max_price`) built as a dynamic `WHERE` clause with matching `?` values
-- Order creation in a single transaction: parent order, trusted product prices from the database, then line items (rollback on failure)
-- Nested order-detail responses: one JOIN query, then mapped into `{ order, items[] }` JSON
-- Centralized errors (`400` / `404` / `409` / `500`) so clients always get `{ "error": "..." }`
-- Transactional seed script that respects foreign-key insert/delete order and asks before wiping data
 
 ## What I Learned
 
