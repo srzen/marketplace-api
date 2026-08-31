@@ -10,6 +10,14 @@ This API models a small marketplace with four related tables (`vendors`, `produc
 
 The [build log](BUILD-LOG.md) records the design decisions behind the schema, routes, and deployment.
 
+## Article
+
+I wrote a walkthrough of this project on Medium, covering my journey and lessons learned.
+
+<a href="https://medium.com/@srzen/i-built-a-multi-vendor-marketplace-api-from-scratch-heres-everything-that-broke-along-the-way-ea0af85e490a?sharedUserId=srzen" target="_blank">
+  <img src="https://img.shields.io/badge/Read%20More%20on-Medium-12100E?style=for-the-badge&logo=medium&logoColor=white" alt="Read More on Medium"/>
+</a>
+
 ## Built With
 
 - Runtime: Node.js
@@ -133,32 +141,13 @@ The executable schema is [`schema.sql`](schema.sql). Design notes, foreign keys,
 - Deleting an order cascades to its line items; a product that appears on an order cannot be deleted while that history remains.
 - `order_items.unit_price` stores the price paid at purchase time, not the product's current listing price.
 
-![](docs/schema_design.png)
+![](docs/schema_design.gif)
 
 ## Request Processing Flow
 
 Requests are parsed as JSON, handled by a route, then either answered or forwarded with `next(err)` to the error middleware. See [`docs/concept-middleware-chain-design.md`](docs/concept-middleware-chain-design.md) for the full chain, including unmatched-route `404`s.
 
-```mermaid
-flowchart TD
-    A[HTTP Request] --> B["express.json()"]
-    B --> C[Route Handler]
-
-    C --> D{Validation Passed?}
-
-    D -->|Yes| E[Database Operations]
-    D -->|No| F["next(new ValidationError)"]
-
-    E --> G{Database Error?}
-
-    G -->|No| H[Success Response]
-    G -->|Yes| I["next(err)"]
-
-    F --> J[Error Handler]
-    I --> J
-
-    J --> K[JSON Error Response]
-```
+![](docs/request_processing_flow.gif)
 
 ## Concept Notes
 
