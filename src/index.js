@@ -7,6 +7,7 @@ const errorHandler = require("./middleware/errorHandler");
 const app = express();
 const port = process.env.PORT || 3000;
 const pool = require("./db/pool");
+const connectMongo = require("./db/mongoConnection");
 
 const vendorRoutes = require("./routes/vendors");
 const productRoutes = require("./routes/products");
@@ -44,6 +45,7 @@ async function connectDatabase() {
 async function startServer() {
   try {
     await connectDatabase();
+    await connectMongo();
     app.listen(port, function () {
       console.log("[SERVER] Listening on port", port);
     });
