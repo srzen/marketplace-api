@@ -12,6 +12,7 @@ const connectMongo = require("./db/mongoConnection");
 const vendorRoutes = require("./routes/vendors");
 const productRoutes = require("./routes/products");
 const orderRoutes = require("./routes/orders");
+const userRoutes = require("./routes/users");
 const authRoutes = require("./routes/auth");
 
 app.use(express.json());
@@ -25,6 +26,7 @@ app.get("/api/health", function (req, res) {
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 
 // No route matched
