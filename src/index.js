@@ -7,10 +7,13 @@ const errorHandler = require("./middleware/errorHandler");
 const app = express();
 const port = process.env.PORT || 3000;
 const pool = require("./db/pool");
+const connectMongo = require("./db/mongoConnection");
 
 const vendorRoutes = require("./routes/vendors");
 const productRoutes = require("./routes/products");
 const orderRoutes = require("./routes/orders");
+const userRoutes = require("./routes/users");
+const authRoutes = require("./routes/auth");
 
 app.use(express.json());
 
@@ -23,6 +26,8 @@ app.get("/api/health", function (req, res) {
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 
 // No route matched
 app.use((req, res) => {
@@ -44,6 +49,7 @@ async function connectDatabase() {
 async function startServer() {
   try {
     await connectDatabase();
+    await connectMongo();
     app.listen(port, function () {
       console.log("[SERVER] Listening on port", port);
     });
